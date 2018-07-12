@@ -5,8 +5,8 @@ const docker = new Docker();
 
 
 class DockerService {
-  async fetchContainers() {
-    const containers = await docker.listContainers();
+  async fetchContainers(opts = {}) {
+    const containers = await docker.listContainers(opts);
     return containers;
   }
 
