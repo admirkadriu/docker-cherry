@@ -3,6 +3,11 @@ const {
 } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
+const AutoLaunch = require('auto-launch');
+
+const cherryAutoLaunch = new AutoLaunch({
+  name: 'DockerCherry',
+});
 
 const DockerService = require('./services/dockerService');
 
@@ -13,6 +18,11 @@ let appTray;
 const config = new Store({
   defaults: {
     remoteDockerConfig: {
+      host: '',
+      port: 2736,
+      caPath: '',
+      certPath: '',
+      keyPath: '',
     },
     isLocalDocker: false,
     startOnStartup: false,
@@ -54,6 +64,12 @@ const configureHelper = () => {
     config.set(args);
 
     dockerService = new DockerService(args.isLocalDocker ? null : args.remoteDockerConfig);
+
+    if (args.startOnStartup) {
+      cherryAutoLaunch.enable();
+    } else {
+      cherryAutoLaunch.disable();
+    }
 
     event.returnValue = true;
     listContainers();

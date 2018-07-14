@@ -19,6 +19,10 @@ ipcRenderer.on('fill-values', (event, arg) => {
   $keyPathInput.value = arg.remoteDockerConfig.keyPath;
   $isLocalDockerCheckBox.checked = arg.isLocalDocker;
   $startOnStartupCheckBox.checked = arg.startOnStartup;
+
+  if (!arg.isLocalDocker) {
+    $remoteDockerDiv.classList.remove('disabledDiv');
+  }
 });
 
 $okButton.addEventListener('click', () => {
