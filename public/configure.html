@@ -1,0 +1,82 @@
+<html>
+
+<head>
+  <link rel="stylesheet" href="bootstrap.min.css"/>
+  <style>
+    .main-container {
+      padding-top: 15px;
+    }
+
+    .margin-right {
+      margin-right: 5px;
+    }
+
+    .form-container {
+      background-color: #fafbfc;
+      border: 1px #dcdcdc solid;
+      border-radius: 5px;
+      padding: 20px 10px 10px;
+      margin-bottom: 10px;
+    }
+
+    .disabledDiv {
+      pointer-events: none;
+      opacity: 0.4;
+    }
+  </style>
+</head>
+
+<body>
+<div class="container main-container">
+  <form onsubmit="return false">
+    <div id="remoteDocker" class="form-container">
+      <div class="form-group row">
+        <label for="host" class="col-sm-3 col-form-label">Host</label>
+        <input type="text" class="col-sm-8 form-control" id="host" placeholder="https://127.0.0.1/">
+      </div>
+
+      <div class="form-group row">
+        <label for="port" class="col-sm-3 col-form-label">Port</label>
+        <input type="text" class="col-sm-8 form-control" id="port" placeholder="2736">
+      </div>
+
+      <div class="form-group row">
+        <label for="caPath" class="col-sm-3 col-form-label">CA path</label>
+        <input type="text" class="col-sm-8 form-control" id="caPath" placeholder="./ca.pem">
+      </div>
+
+      <div class="form-group row">
+        <label for="certPath" class="col-sm-3 col-form-label">Cert Path</label>
+        <input type="text" class="col-sm-8 form-control" id="certPath" placeholder="./cert.pem">
+      </div>
+
+      <div class="form-group row">
+        <label for="keyPath" class="col-sm-3 col-form-label">Key Path</label>
+        <input type="text" class="col-sm-8 form-control" id="keyPath" placeholder="./key.pem">
+      </div>
+    </div>
+
+    <div class="form-container">
+      <div class="row">
+        <div class=" col-sm-6 form-group">
+          <label class="col-sm-11 form-check-label" for="isLocalDocker">Connect to local docker</label>
+          <input class="col-sm-1 form-check-input" type="checkbox" id="isLocalDocker">
+        </div>
+
+        <div class="col-sm-5 form-group">
+          <label class="col-sm-11 form-check-label" for="startOnStartup">Start on startup</label>
+          <input class="col-sm-1 form-check-input" type="checkbox" id="startOnStartup">
+        </div>
+      </div>
+    </div>
+
+    <button type="button" id="ok" class="btn btn-primary margin-right">Ok</button>
+    <button type="cancel" id="cancel" class="btn btn-danger margin-right">Cancel</button>
+  </form>
+</div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

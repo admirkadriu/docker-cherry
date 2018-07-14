@@ -1,13 +1,69 @@
 const {
-  app, BrowserWindow, Tray, Menu,
+  app, BrowserWindow, Tray, Menu, ipcMain,
 } = require('electron');
+const path = require('path');
 const Store = require('electron-store');
-const DockerService = require('./DockerService');
 
-let appTray = null;
-let win = null;
+const DockerService = require('./services/dockerService');
 
-const service = new DockerService();
+let win;
+let configureWindow;
+let appTray;
+
+const config = new Store({
+  defaults: {
+    remoteDockerConfig: {
+    },
+    isLocalDocker: false,
+    startOnStartup: false,
+    first_time: true,
+  },
+});
+
+let dockerService = new DockerService(config.get('isLocalDocker') ? null : config.get('remoteDockerConfig'));
+
+const configureHelper = () => {
+  if (configureWindow) {
+    configureWindow.focus();
+    return;
+  }
+
+  configureWindow = new BrowserWindow({
+    width: 600,
+    height: 500,
+    title: 'Configure Docker Cherry',
+    resizable: false,
+    movable: true,
+    minimizable: false,
+    maximizable: false,
+    autoHideMenuBar: true,
+    webPreferences: {
+      devTools: false,
+    },
+    alwaysOnTop: false,
+    frame: true,
+  });
+
+  configureWindow.loadURL(`file://${path.join(__dirname, 'public', 'configure.html')}`);
+  configureWindow.webContents.on('did-finish-load', () => {
+    configureWindow.webContents.send('fill-values', config.store);
+  });
+
+  ipcMain.on('updated-values', (event, args) => {
+    config.set('first_time', false);
+    config.set(args);
+
+    dockerService = new DockerService(args.isLocalDocker ? null : args.remoteDockerConfig);
+
+    event.returnValue = true;
+    listContainers();
+  });
+
+  configureWindow.on('closed', () => {
+    configureWindow = null;
+  });
+};
+
 
 const getMenuItemsFromContainers = containers => containers.map(container => ({
   label: `${container.Names[0]}`,
@@ -15,33 +71,36 @@ const getMenuItemsFromContainers = containers => containers.map(container => ({
     {
       label: 'Restart',
       click: () => {
-        service.restartContainer(container.Id);
+        dockerService.restartContainer(container.Id);
+        listContainers();
       },
     },
     {
       label: 'Logs..',
       click: () => {
-        service.getContainerLogs(container.Id);
+        dockerService.getContainerLogs(container.Id);
       },
     },
     {
       label: container.State === 'running' ? 'Stop' : 'Start',
       click: () => {
         if (container.State === 'running') {
-          service.stopContainer(container.Id);
+          dockerService.stopContainer(container.Id);
         } else {
-          service.startContainer(container.Id);
+          dockerService.startContainer(container.Id);
         }
+        listContainers();
       },
     },
   ],
 }));
 
-
 const listContainers = async () => {
+  appTray.setContextMenu(Menu.buildFromTemplate(commonMenu));
+
   appTray.setToolTip('Loading containers...');
 
-  const containers = await service.fetchContainers({ all: true });
+  const containers = await dockerService.fetchContainers({ all: true });
 
   const runningContainers = [];
   const stoppedContainers = [];
@@ -63,20 +122,6 @@ const listContainers = async () => {
       submenu: getMenuItemsFromContainers(stoppedContainers),
     }];
 
-
-  const commonMenu = [
-    {
-      label: 'Configure',
-    },
-    {
-      label: 'Refresh',
-      click: listContainers,
-    },
-    {
-      role: 'quit',
-    },
-  ];
-
   const contextMenu = await Menu.buildFromTemplate([
     ...containersMenu,
     { type: 'separator' },
@@ -89,6 +134,21 @@ const listContainers = async () => {
   console.info('Loaded containers successfully.');
 };
 
+
+const commonMenu = [
+  {
+    label: 'Configure',
+    click: configureHelper,
+  },
+  {
+    label: 'Refresh',
+    click: listContainers,
+  },
+  {
+    role: 'quit',
+  },
+];
+
 app.on('ready', () => {
   win = new BrowserWindow({
     autoHideMenuBar: true,
@@ -98,7 +158,11 @@ app.on('ready', () => {
     show: false,
   });
 
-  appTray = new Tray('docker.ico');
+  appTray = new Tray(path.join(__dirname, 'build', 'docker.ico'));
 
-  listContainers();
+  if (config.get('first_time')) {
+    configureHelper();
+  } else {
+    listContainers();
+  }
 });
