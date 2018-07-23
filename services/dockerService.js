@@ -1,5 +1,6 @@
 const fs = require('fs');
 const Docker = require('dockerode');
+const { dialog } = require('electron');
 
 class DockerService {
   constructor(opts) {
@@ -18,7 +19,6 @@ class DockerService {
       }
 
       this.dockerProvider = new Docker(config);
-
       return;
     }
 
@@ -38,9 +38,18 @@ class DockerService {
   async getContainerLogs(containerId) {
     const container = this.dockerProvider.getContainer(containerId);
 
-    const data = await container.logs();
+    const logOpts = {
+      stdout: 1,
+      stderr: 1,
+      tail: 100,
+      follow: 0,
+    };
+
+    const data = await container.logs(logOpts);
 
     console.log(data);
+
+    return data;
   }
 
   async startContainer(containerId) {
@@ -53,5 +62,9 @@ class DockerService {
     await container.stop();
   }
 }
+
+process.on('unhandledRejection', (reason) => { // Temporary
+  dialog.showErrorBox('Error on application', reason.message);
+});
 
 module.exports = DockerService;

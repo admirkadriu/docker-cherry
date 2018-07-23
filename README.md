@@ -1,5 +1,5 @@
 ## docker-cherry
-Quickly menage docker containers from the system tray.
+Quickly manage docker containers from the system tray.
 
 Inspired by https://github.com/aulisius/jira-task-helper
 

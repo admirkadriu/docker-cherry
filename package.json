@@ -1,21 +1,17 @@
 {
-  "name": "electron-quick-start",
+  "name": "docker-cherry",
   "version": "1.0.0",
-  "description": "A minimal Electron application",
+  "description": "Quickly manage docker containers from the system tray",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/electron/electron-quick-start",
+  "repository": "https://github.com/admirkadriu/docker-cherry",
   "keywords": [
     "Electron",
-    "quick",
-    "start",
-    "tutorial",
-    "demo"
+    "docker"
   ],
-  "author": "GitHub",
-  "license": "CC0-1.0",
+  "license": "MIT",
   "devDependencies": {
     "eslint": "^4.16.0",
     "eslint-config-airbnb-base": "^12.1.0",

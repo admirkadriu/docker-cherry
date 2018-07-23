@@ -1,5 +1,5 @@
 const {
-  app, BrowserWindow, Tray, Menu, ipcMain,
+  app, BrowserWindow, Tray, Menu, ipcMain, dialog,
 } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
@@ -63,6 +63,7 @@ const configureHelper = () => {
     config.set('first_time', false);
     config.set(args);
 
+
     dockerService = new DockerService(args.isLocalDocker ? null : args.remoteDockerConfig);
 
     if (args.startOnStartup) {
@@ -93,8 +94,12 @@ const getMenuItemsFromContainers = containers => containers.map(container => ({
     },
     {
       label: 'Logs..',
-      click: () => {
-        dockerService.getContainerLogs(container.Id);
+      click: async () => {
+        const data = await dockerService.getContainerLogs(container.Id);
+        dialog.showMessageBox({
+          message: data,
+          buttons: ['OK'],
+        });
       },
     },
     {
