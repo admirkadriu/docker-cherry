@@ -3,6 +3,8 @@ Quickly manage docker containers from the system tray.
 
 Inspired by https://github.com/aulisius/jira-task-helper
 
+![ScreenShot](https://i.imgur.com/hORv42x.png)
+
 ## Getting started
 
 ```sh
