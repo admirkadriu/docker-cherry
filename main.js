@@ -1,5 +1,5 @@
 const {
-  app, BrowserWindow, Tray, Menu, ipcMain, dialog,
+  app, BrowserWindow, Tray, Menu, ipcMain, dialog, nativeImage,
 } = require('electron');
 const path = require('path');
 const Store = require('electron-store');
@@ -179,7 +179,8 @@ app.on('ready', () => {
     show: false,
   });
 
-  appTray = new Tray(path.join(__dirname, 'build', 'docker.ico'));
+  const iconPath = path.join(__dirname, 'build', 'docker.ico');
+  appTray = new Tray(nativeImage.createFromPath(iconPath));
 
   if (config.get('first_time')) {
     configureHelper();
